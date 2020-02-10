@@ -1,0 +1,115 @@
+﻿@model Spice.Models.ViewModel.MenuItemViewModel
+@using Spice.Extension
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<h2 class="text-info">Create Menu Item</h2>
+<br />
+
+<form method="post" enctype="multipart/form-data">
+    <div class="border backgroundwhite">
+        <div asp-validation-summary="ModelOnly" class="text-danger">
+
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="MenuDetails.Name" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="MenuDetails.Name" class="form-control" />
+            </div>
+            <span asp-validation-for="MenuDetails.Name" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="MenuDetails.Description" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                @Html.TextAreaFor(m => m.MenuDetails.Description)
+            </div>
+            <span asp-validation-for="MenuDetails.Description" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="MenuDetails.Price" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="MenuDetails.Price" class="form-control" />
+            </div>
+            <span asp-validation-for="MenuDetails.Price" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="MenuDetails.Image" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                <input type="file" name="files" multiple class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="MenuDetails.CategoryId" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                <select id="CategoryId" asp-for="@Model.MenuDetails.CategoryId" asp-items="Model.Category.ToSelectListItem(Model.MenuDetails.CategoryId)" class="form-control"></select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="MenuDetails.SubCategoryId" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                <select id="SubCategoryId" name="SubCategoryId" asp-for="@Model.MenuDetails.SubCategoryId" asp-items="@(new SelectList(string.Empty,"Id","Name"))" class="form-control"></select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="MenuDetails.Spicyness" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                <select asp-for="MenuDetails.Spicyness" asp-items="Html.GetEnumSelectList<MenuDetails.ESpicy>()" class="form-control"></select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-5 offset-2">
+                <partial name="_CreateAndBackListPartial" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{@{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+    tinymce.init({
+        selector: 'textarea',
+        plugins: "lists",
+        menubar: 'file edit format'
+    });</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        getSubcategorylist();
+        $('#CategoryId').change(function () {
+            getSubcategorylist();
+        });
+    });
+
+    function getSubcategorylist() {
+        var url = '@Url.Content("~/")' + "Admin/SubCategory/GetSubCategory";
+
+        var ddldatasource = $('#CategoryId');
+        $.getJSON(url, { id: $(ddldatasource).val() }, function (data) {
+            var items = '';
+            $('#SubCategoryId').empty();
+            $.each(data, function (i, subcategory) {
+                items += "<option value='" + subcategory.value + "'>" + subcategory.text + "</option>";
+            });
+            $('#SubCategoryId').html(items);
+        });
+    }
+</script>
+}
